@@ -3,9 +3,10 @@ FROM python:3.11-slim
 WORKDIR /app
 
 # Install system dependencies for OpenCV and YOLO
+# Note: libgl1-mesa-glx replaced with libgl1 in Debian Trixie
 RUN apt-get update && apt-get install -y \
     curl \
-    libgl1-mesa-glx \
+    libgl1 \
     libglib2.0-0 \
     libsm6 \
     libxext6 \

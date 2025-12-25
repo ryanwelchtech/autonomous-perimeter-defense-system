@@ -87,3 +87,25 @@ tmp/
 temp/
 *.tmp
 
+# Cache directories
+.cache/
+*.cache
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Documentation (personal)
+docs/LINKEDIN_POST.md
+docs/RESUME_BULLETS.md
+
+# Test outputs
+test-results/
+test-reports/
+*.xml
+*.html
+coverage/
+.coverage.*
+.pytest_cache/
+test-results.xml
+junit.xml
+
