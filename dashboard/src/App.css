@@ -1,0 +1,266 @@
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+}
+
+.login-box {
+  background: #1a1f3a;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  max-width: 400px;
+}
+
+.login-box h1 {
+  color: #4a9eff;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.login-box h2 {
+  color: #8b9dc3;
+  font-size: 1rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  font-weight: normal;
+}
+
+.login-box form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.login-box input {
+  padding: 0.75rem;
+  border: 1px solid #2d3553;
+  border-radius: 4px;
+  background: #0f1422;
+  color: #e0e0e0;
+  font-size: 1rem;
+}
+
+.login-box input:focus {
+  outline: none;
+  border-color: #4a9eff;
+}
+
+.login-box button {
+  padding: 0.75rem;
+  background: #4a9eff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.login-box button:hover {
+  background: #3a8eef;
+}
+
+.error {
+  color: #ff6b6b;
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.login-hint {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: #0f1422;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  color: #8b9dc3;
+  text-align: center;
+}
+
+.login-hint p {
+  margin: 0.25rem 0;
+}
+
+.dashboard {
+  min-height: 100vh;
+  background: #0a0e27;
+}
+
+.dashboard-header {
+  background: #1a1f3a;
+  padding: 1.5rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #2d3553;
+}
+
+.dashboard-header h1 {
+  color: #4a9eff;
+  font-size: 1.5rem;
+}
+
+.logout-btn {
+  padding: 0.5rem 1rem;
+  background: #ff6b6b;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.logout-btn:hover {
+  background: #ff5252;
+}
+
+.dashboard-content {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: #1a1f3a;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid #2d3553;
+}
+
+.stat-card h3 {
+  color: #4a9eff;
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+}
+
+.stat-card p {
+  color: #e0e0e0;
+  margin: 0.5rem 0;
+  font-size: 0.95rem;
+}
+
+.alerts-section {
+  background: #1a1f3a;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid #2d3553;
+}
+
+.alerts-section h2 {
+  color: #4a9eff;
+  margin-bottom: 1.5rem;
+}
+
+.alerts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.alert-item {
+  background: #0f1422;
+  padding: 1rem;
+  border-radius: 6px;
+  border-left: 4px solid #4a9eff;
+}
+
+.alert-item.critical {
+  border-left-color: #ff6b6b;
+}
+
+.alert-item.high_threat {
+  border-left-color: #ffa500;
+}
+
+.alert-item.suspicious {
+  border-left-color: #ffd700;
+}
+
+.alert-header {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.alert-id {
+  color: #8b9dc3;
+  font-family: monospace;
+  font-size: 0.9rem;
+}
+
+.threat-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.threat-badge.critical {
+  background: #ff6b6b;
+  color: white;
+}
+
+.threat-badge.high_threat {
+  background: #ffa500;
+  color: white;
+}
+
+.threat-badge.suspicious {
+  background: #ffd700;
+  color: #000;
+}
+
+.threat-score {
+  color: #4a9eff;
+  font-weight: bold;
+}
+
+.alert-body {
+  margin: 0.5rem 0;
+}
+
+.alert-body p {
+  color: #e0e0e0;
+  margin: 0.25rem 0;
+}
+
+.alert-time {
+  color: #8b9dc3;
+  font-size: 0.85rem;
+}
+
+.acknowledge-btn {
+  margin-top: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: #4a9eff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.acknowledge-btn:hover {
+  background: #3a8eef;
+}
+
+.acknowledged {
+  margin-top: 0.5rem;
+  color: #8b9dc3;
+  font-size: 0.85rem;
+  font-style: italic;
+}
+

@@ -1,0 +1,213 @@
+version: '3.8'
+
+services:
+  # Redis for caching and message queuing
+  redis:
+    image: redis:7-alpine
+    container_name: apds-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - apds-network
+
+  # PostgreSQL for persistent storage
+  postgres:
+    image: postgres:15-alpine
+    container_name: apds-postgres
+    environment:
+      POSTGRES_DB: apds
+      POSTGRES_USER: apds_user
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme_in_production}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U apds_user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - apds-network
+
+  # Authentication Service
+  auth-service:
+    build:
+      context: .
+      dockerfile: services/auth/Dockerfile
+    container_name: apds-auth
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - JWT_SECRET=${JWT_SECRET:-changeme_in_production}
+      - JWT_ALGORITHM=HS256
+      - JWT_EXPIRATION=3600
+    ports:
+      - "8001:8000"
+    depends_on:
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - apds-network
+
+  # Computer Vision Detection Service
+  cv-detection-service:
+    build:
+      context: .
+      dockerfile: services/cv_detection/Dockerfile
+    container_name: apds-cv-detection
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - AUTH_SERVICE_URL=http://auth-service:8000
+      - MODEL_PATH=/app/models/yolov8n.pt
+      - CONFIDENCE_THRESHOLD=0.5
+      - DETECTION_INTERVAL=0.1
+    ports:
+      - "8002:8000"
+    volumes:
+      - ./models:/app/models:ro
+      - ./data/samples:/app/data/samples:ro
+    depends_on:
+      - redis
+      - auth-service
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - apds-network
+
+  # ML Threat Classification Service
+  ml-classification-service:
+    build:
+      context: .
+      dockerfile: services/ml_classification/Dockerfile
+    container_name: apds-ml-classification
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=apds
+      - POSTGRES_USER=apds_user
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-changeme_in_production}
+      - AUTH_SERVICE_URL=http://auth-service:8000
+      - MODEL_PATH=/app/models/threat_classifier.pkl
+    ports:
+      - "8003:8000"
+    volumes:
+      - ./models:/app/models:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      auth-service:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - apds-network
+
+  # Alert Service
+  alert-service:
+    build:
+      context: .
+      dockerfile: services/alert/Dockerfile
+    container_name: apds-alert
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=apds
+      - POSTGRES_USER=apds_user
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-changeme_in_production}
+      - AUTH_SERVICE_URL=http://auth-service:8000
+      - ALERT_THRESHOLD=0.7
+    ports:
+      - "8004:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      auth-service:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - apds-network
+
+  # API Gateway
+  api-gateway:
+    build:
+      context: .
+      dockerfile: services/api_gateway/Dockerfile
+    container_name: apds-api-gateway
+    environment:
+      - AUTH_SERVICE_URL=http://auth-service:8000
+      - CV_DETECTION_SERVICE_URL=http://cv-detection-service:8000
+      - ML_CLASSIFICATION_SERVICE_URL=http://ml-classification-service:8000
+      - ALERT_SERVICE_URL=http://alert-service:8000
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    ports:
+      - "8000:8000"
+    depends_on:
+      - auth-service
+      - cv-detection-service
+      - ml-classification-service
+      - alert-service
+      - redis
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - apds-network
+
+  # Dashboard Frontend
+  dashboard:
+    build:
+      context: .
+      dockerfile: dashboard/Dockerfile
+    container_name: apds-dashboard
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_API_URL=http://localhost:8000
+    depends_on:
+      - api-gateway
+    networks:
+      - apds-network
+
+volumes:
+  redis-data:
+  postgres-data:
+
+networks:
+  apds-network:
+    driver: bridge
+
